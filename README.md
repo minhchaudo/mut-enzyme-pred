@@ -26,6 +26,8 @@ For prediction using our trained model, provide at least the path to your data a
 python -m meep -data your/data/path.csv -o your/prediction/path.csv
 ```
 
+Your data file is expected to be a .csv file with separator "," and contains the following columns: "id", "wt_seqs", "mut_seqs".
+
 The default task is classification. You can include the -reg flag to switch to regression.
 
 ```
@@ -50,7 +52,9 @@ For training a regression model, please include the -reg flag.
 python -m meep -train -reg -traindata your/data/path.csv -ms your/model/save/path.pkl
 ```
 
-For model validation and testing, can also specify the proportion of the test set.
+Your training data file is expected to be a .csv file with separator "," and contains the following columns: "id", "wt_seqs", "mut_seqs", and "val". The "val" column should contain float values in case of regression and binary values (0 and 1) in the case of classification. To illustrate, please take a look at the files data_li/df_li_class.csv and data_li/df_li_reg.csv.
+
+For model validation and testing, you can also specify the proportion of the test set.
 
 ```
 python -m meep -train -reg -traindata your/data/path.csv -ms your/model/save/path.pkl -ts 0.1
