@@ -144,7 +144,7 @@ def train(datapath, device, model_save_path, selector_save_path, desc_columns_sa
             algo = XGBRegressor
         else:
             algo = XGBClassifier
-        train_and_save_model(full_df[:-1], full_df["val"], algo, test_size, model_save_path, selector_save_path)
+        train_and_save_model(full_df.iloc[:,:-1], full_df["val"], algo, test_size, model_save_path, selector_save_path)
     except Exception as error:
         print("An error occurred!!!")
         print(error)

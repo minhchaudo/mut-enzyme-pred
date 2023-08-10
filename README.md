@@ -19,7 +19,7 @@ cd ..
 
 ### 3. Usage:
 
-MEEP can be used for either prediction or training.
+MEEP can be used for either prediction or training with your own dataset.
 For prediction using our trained model, provide at least the path to your data and the path to write the output predictions.
 
 ```
@@ -41,19 +41,19 @@ python -m meep -data your/data/path.csv -o your/prediction/path.csv -m your/path
 For training a classification model, please specify at least the path to the training data and the path to save the output model.
 
 ```
-python -m meep -traindata your/data/path.csv -ms your/model/save/path.pkl
+python -m meep -train -traindata your/data/path.csv -ms your/model/save/path.pkl
 ```
 
 For training a regression model, please include the -reg flag.
 
 ```
-python -m meep -reg -traindata your/data/path.csv -ms your/model/save/path.pkl
+python -m meep -train -reg -traindata your/data/path.csv -ms your/model/save/path.pkl
 ```
 
 For model validation and testing, can also specify the proportion of the test set.
 
 ```
-python -m meep -reg -traindata your/data/path.csv -ms your/model/save/path.pkl -ts 0.1
+python -m meep -train -reg -traindata your/data/path.csv -ms your/model/save/path.pkl -ts 0.1
 ```
 
 For a list of complete arguments, please run
