@@ -124,7 +124,7 @@ def train_and_save_model(X, Y, algo, test_size, model_save_path, selector_save_p
     X_train_new, X_test_new = feature_select(X_train, X_test, Y_train, algo, selector_save_path)
     opt_model, opt_params = optimize(X_train_new, Y_train, algo)
     cross_val_and_test(opt_model, X_train_new, Y_train, X_test_new, Y_test)
-    train_full_model(np.concatenate([X_train_new, X_test_new]), np.concatenate([Y_train, X_test]), algo, opt_params, model_save_path)
+    train_full_model(np.concatenate([X_train_new, X_test_new]), np.concatenate([Y_train, Y_test]), algo, opt_params, model_save_path)
     print(f"Full model saved to {model_save_path}")
 
 
