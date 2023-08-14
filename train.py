@@ -128,18 +128,23 @@ def train_and_save_model(X, Y, algo, test_size, model_save_path, selector_save_p
     print(f"Full model saved to {model_save_path}")
 
 
-def train(datapath, device, model_save_path, selector_save_path, desc_columns_save_path, reg, test_size):
+def train(datapath, device, model_save_path, selector_save_path, desc_columns_save_path, reg, subs, test_size):
     try:
         df = pd.read_csv(datapath).set_index("id")
         wt_seqs = df["wt_seqs"].to_dict()
         mut_seqs = df["mut_seqs"].to_dict()
-        smiles, id = df["smiles"], df.index
-        assert set(wt_seqs.keys()) == set(mut_seqs.keys()) == set(id)
         model, tokenizer = get_model(device)
         wt_embs_df = get_embeddings(model, tokenizer, wt_seqs, device)
         mut_embs_df = get_embeddings(model, tokenizer, mut_seqs, device)
-        descriptors = get_descriptors(smiles, id, desc_columns_save_path)
-        full_df = pd.concat([wt_embs_df, mut_embs_df, descriptors, df["val"]], axis=1)
+        if subs is True:
+            if "smiles" in df.columns:
+                smiles, id = df["smiles"], df.index
+                descriptors = get_descriptors(smiles, id, desc_columns_save_path)
+                full_df = pd.concat([wt_embs_df, mut_embs_df, descriptors, df["val"]], axis=1)
+            else:
+                print("Warning: Substrate information is expected to be incorporated, but your data doesn't contain the 'smiles' column. Ignoring the -subs flag.")
+        else:
+            full_df = pd.concat([wt_embs_df, mut_embs_df, df["val"]], axis=1)
         if reg:
             algo = XGBRegressor
         else:

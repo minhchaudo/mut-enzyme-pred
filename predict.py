@@ -54,8 +54,11 @@ def get_descriptors(smiles, id, desc_cols_path):
     df.index = id
     return df
 
-def get_preds_df(model_path, selector_path, wt_embs, mut_embs, descriptors):
-    X = pd.concat([wt_embs, mut_embs, descriptors], axis=1)
+def get_preds_df(model_path, selector_path, wt_embs, mut_embs, descriptors=None):
+    if descriptors is not None:
+        X = pd.concat([wt_embs, mut_embs, descriptors], axis=1)
+    else:
+        X = pd.concat([wt_embs, mut_embs], axis=1)
     index = pd.Series(X.index)
     X = X.to_numpy()
     selector = pickle.load(open(selector_path, "rb"))
@@ -66,17 +69,23 @@ def get_preds_df(model_path, selector_path, wt_embs, mut_embs, descriptors):
     preds_df.columns = ["ID", "predictions"]
     return preds_df
 
-def predict(data_path, out_path, device, model_path, selector_path, desc_cols_path):
+def predict(data_path, out_path, device, model_path, selector_path, desc_cols_path=None):
     try:
         df = pd.read_csv(data_path).set_index("id")
         wt_seqs = df["wt_seqs"].to_dict()
         mut_seqs = df["mut_seqs"].to_dict()
-        smiles, id = df["smiles"], df.index
         model, tokenizer = get_model(device)
         wt_embs_df = get_embeddings(model, tokenizer, wt_seqs, device)
         mut_embs_df = get_embeddings(model, tokenizer, mut_seqs, device)
-        descriptors = get_descriptors(smiles, id, desc_cols_path)
-        preds_df = get_preds_df(model_path, selector_path, wt_embs_df, mut_embs_df, descriptors)
+        if desc_cols_path is not None:
+            if "smiles" in df.columns:
+                smiles, id = df["smiles"], df.index
+                descriptors = get_descriptors(smiles, id, desc_cols_path)
+                preds_df = get_preds_df(model_path, selector_path, wt_embs_df, mut_embs_df, descriptors)
+            else:
+                print("Warning: Substrate information is expected, but the data doesn't contain the 'smiles' column. Ignoring the '-subs' flag.")
+        else:
+            preds_df = get_preds_df(model_path, selector_path, wt_embs_df, mut_embs_df)
         preds_df.to_csv(out_path, index=False)
         print(f"Predictions saved to {out_path}")
     except Exception as error:

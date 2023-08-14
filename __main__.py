@@ -9,6 +9,7 @@ arg_list = sys.argv[1:]
 parser = argparse.ArgumentParser()
 parser.add_argument("-train", action="store_true", help="If flag is present, switch to training mode (prediction is the default)")
 parser.add_argument("-reg", action="store_true", help="If flag is present, switch to regression task (classification is the default)")
+parser.add_argument("-subs", action="store_true", help="If flag is present, substrate information (SMILES) is incorporated.")
 parser.add_argument("-data", help="Path to the csv file for predictions")
 parser.add_argument("-o", help="Path for the output prediction file")
 parser.add_argument("-m", help="Path to model, defaults to /models/xgb_reg.pkl for regression and /models/xgb_class.pkl for classification")
@@ -37,9 +38,9 @@ if __name__ == "__main__":
             cs = args.cs if args.cs is not None else PATH + "/models/my_desc_cols.txt"
             ts = args.ts if args.ts is not None else .1
             from train import train
-            train(args.traindata, device, ms, ss, cs, args.reg, ts)
+            train(args.traindata, device, ms, ss, cs, args.reg, args.subs, ts)
         except AssertionError:
-            print("Please provide at least path to training data (-d)")
+            print("Please provide at least path to training data (-traindata) and path to save the trained model (-ms)!")
 
     else:
         try:
@@ -47,7 +48,7 @@ if __name__ == "__main__":
             from predict import predict
             m = args.m if args.m is not None else PATH + "/models/xgb_reg.pkl" if args.reg is True else PATH + "/models/xgb_class.pkl"
             s = args.s if args.s is not None else PATH + "/models/xgb_selector.pkl"
-            c = args.c if args.c is not None else PATH + "/models/descriptors_columns.txt"
+            c = None if args.subs is False else args.c if args.c is not None else PATH + "/models/descriptors_columns.txt"
             predict(args.data, args.o, device, m, s, c)
         except AssertionError:
             print("Please provide at least the path to the data (-data) and the path to save the output predictions (-o)!")
