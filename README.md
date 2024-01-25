@@ -1,4 +1,4 @@
-# Mutated enzyme efficiency prediction (MEEP)
+# Mutated enzyme efficiency prediction
 
 ### 1. Introduction:
 
